@@ -29,9 +29,8 @@ We reserve the right to consider out of the scope of Thymeleaf's security:
 
 ## Supported Versions
 
-  * 3.1.x is the current development line. This version is **not** recommended for production use yet.
-  * 3.0.x is the latest production line (GA as of May 2016) and is under active support.
-  * 2.1.x and previous versions are no longer supported. No further maintenance
+  * 3.1.x is the latest production line and is under active support.
+  * 3.0.x and previous versions are no longer supported. No further maintenance
     and security patches are planned in those lines.
 
-At this point, we recommend upgrading to the latest Thymeleaf 3.0.x release.
+At this point, we recommend upgrading to the latest Thymeleaf 3.1.x release.
