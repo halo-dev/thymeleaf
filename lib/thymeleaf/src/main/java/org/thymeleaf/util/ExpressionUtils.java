@@ -126,6 +126,8 @@ public final class ExpressionUtils {
 
     private static final Set<String> BLOCKED_MEMBER_CALL_JAVA_SUPERS_NAMES =
             new HashSet<>(Arrays.asList(
+                    // java.lang
+                    "java.lang.ClassLoader",
                     // org.thymeleaf
                     "org.thymeleaf.standard.expression.IStandardVariableExpressionEvaluator",
                     "org.thymeleaf.standard.expression.IStandardExpressionParser",
@@ -136,7 +138,8 @@ public final class ExpressionUtils {
                     "org.thymeleaf.spring6.expression.IThymeleafEvaluationContext",
                     // org.springframework
                     "org.springframework.web.servlet.support.RequestContext",
-                    "org.springframework.web.reactive.result.view.RequestContext"));
+                    "org.springframework.web.reactive.result.view.RequestContext",
+                    "org.springframework.core.io.ResourceLoader"));
     private static final Set<Class<?>> BLOCKED_MEMBER_CALL_JAVA_SUPERS;
 
     private static final Set<String> ALLOWED_CLASS_METHODS =
