@@ -20,6 +20,7 @@
 
 package org.thymeleaf.util;
 
+import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -137,6 +138,13 @@ public final class ExpressionUtils {
                     "org.springframework.web.servlet.support.RequestContext",
                     "org.springframework.web.reactive.result.view.RequestContext"));
     private static final Set<Class<?>> BLOCKED_MEMBER_CALL_JAVA_SUPERS;
+
+    private static final Set<String> ALLOWED_CLASS_METHODS =
+            new HashSet<>(Arrays.asList(
+                    "getName", "isAssignableFrom", "isInstance",
+                    "isInterface", "isPrimitive", "isRecord", "isAnnotation", "isArray", "isEnum"));
+    private static final Set<String> BLOCKED_CLASS_METHODS =
+            Arrays.stream(Class.class.getDeclaredMethods()).map(Method::getName).collect(Collectors.toSet());
 
 
     static {
@@ -287,11 +295,11 @@ public final class ExpressionUtils {
         }
 
         // If the target itself is a class, that means we are calling a static method on it. And therefore we
-        // will need to determine whether the class itself is blocked.
+        // will need to determine whether the class itself is blocked and whether the method being called is allowed.
         if (target instanceof Class<?>) {
             final String targetTypeName = ((Class<?>) target).getName();
-            // If target is a blocked class, we will only allow calling "getName"
-            return "getName".equals(normalizedMemberName) || isTypeAllowed(targetTypeName);
+            return ALLOWED_CLASS_METHODS.contains(normalizedMemberName) ||
+                   (!BLOCKED_CLASS_METHODS.contains(normalizedMemberName) && isTypeAllowed(targetTypeName));
         }
 
         return isMemberAllowedForInstanceOfType(target.getClass(), normalizedMemberName);
