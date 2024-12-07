@@ -22,6 +22,7 @@ package org.thymeleaf.spring.reactive.exchange;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -45,6 +46,7 @@ public final class TestingServerHttpRequest implements ServerHttpRequest {
     private final Flux<DataBuffer> body;
     private final MultiValueMap<String, String> queryParams;
     private final MultiValueMap<String, HttpCookie> cookies;
+    private final Map<String, Object> attributes;
 
 
     public TestingServerHttpRequest(final String path, final Map<String,List<String>> queryParams) {
@@ -60,6 +62,7 @@ public final class TestingServerHttpRequest implements ServerHttpRequest {
         this.body = Flux.empty();
         this.queryParams = new LinkedMultiValueMap<String,String>(queryParams);
         this.cookies = new LinkedMultiValueMap<>();
+        this.attributes = new HashMap<>();
     }
 
 
@@ -100,6 +103,11 @@ public final class TestingServerHttpRequest implements ServerHttpRequest {
     }
 
     @Override
+    public InetSocketAddress getLocalAddress() {
+        return null;
+    }
+
+    @Override
     public InetSocketAddress getRemoteAddress() {
         return null;
     }
@@ -110,14 +118,13 @@ public final class TestingServerHttpRequest implements ServerHttpRequest {
     }
 
     @Override
-    @Deprecated
-    public String getMethodValue() {
-        return HttpMethod.GET.name();
+    public URI getURI() {
+        return this.uri;
     }
 
     @Override
-    public URI getURI() {
-        return this.uri;
+    public Map<String, Object> getAttributes() {
+        return this.attributes;
     }
 
     @Override
