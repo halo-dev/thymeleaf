@@ -33,6 +33,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Currency;
 import java.util.Date;
+import java.util.Deque;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -105,7 +106,7 @@ public final class ExpressionUtils {
                     BigDecimal.class, BigInteger.class, RoundingMode.class,
                     // java.util
                     ArrayList.class, LinkedList.class, HashMap.class, LinkedHashMap.class, HashSet.class,
-                    LinkedHashSet.class, Iterator.class, Enumeration.class, Locale.class, Properties.class,
+                    LinkedHashSet.class, Iterator.class, Enumeration.class, Deque.class, Locale.class, Properties.class,
                     Date.class, Calendar.class, Optional.class, OptionalDouble.class, OptionalInt.class,
                     OptionalLong.class, UUID.class, Currency.class,
                     // java.util.concurrent.atomic
