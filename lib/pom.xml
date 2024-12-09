@@ -144,8 +144,8 @@
               </goals>
               <configuration>
                 <target name="copy javadocs element-list to package-list">
-                  <copy file="${project.build.directory}/apidocs/element-list"
-                        tofile="${project.build.directory}/apidocs/package-list"
+                  <copy file="${project.build.directory}/reports/apidocs/element-list"
+                        tofile="${project.build.directory}/reports/apidocs/package-list"
                         failonerror="false" />
                 </target>
               </configuration>
