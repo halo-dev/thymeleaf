@@ -97,7 +97,7 @@
             <release>${maven.javadoc.release}</release>
             <overview>${basedir}/src/main/javadoc/overview.html</overview>
             <javadocDirectory>${basedir}/src/main/javadoc</javadocDirectory>
-            <outputDirectory>${project.build.directory}/apidocs</outputDirectory>
+            <outputDirectory>${project.build.directory}</outputDirectory>
             <doclint>all,-missing</doclint>
           </configuration>
           <executions>
