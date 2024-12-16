@@ -3,7 +3,7 @@
 <!--
   ~ =============================================================================
   ~
-  ~   Copyright (c) 2011-2022, The THYMELEAF team (http://www.thymeleaf.org)
+  ~   Copyright (c) 2011-2025 Thymeleaf (http://www.thymeleaf.org)
   ~
   ~   Licensed under the Apache License, Version 2.0 (the "License");
   ~   you may not use this file except in compliance with the License.
@@ -93,8 +93,8 @@
   <developers>
     <developer>
       <name>Thymeleaf</name>
-      <organization>The Thymeleaf Team</organization>
-      <organizationUrl>https://www.thymeleaf.org/team.html</organizationUrl>
+      <organization>Thymeleaf</organization>
+      <organizationUrl>https://www.thymeleaf.org</organizationUrl>
     </developer>
   </developers>
 
