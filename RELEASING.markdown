@@ -65,4 +65,15 @@ back to SNAPSHOT versions wherever needed and commit.
 
 Follow instructions at https://central.sonatype.org/publish/publish-guide/
 
+## 8. Releasing distribution artifacts
+
+Once jar artifacts have been published in Maven Central, the .zip distribution release
+generated in dist/target should be uploaded to the GitHub repository as a new release
+along with a gpg signature (.asc) generated with:
+
+```shell
+gpg -ab --default-key key_ID_for_releases@thymeleaf.org thymeleaf-X.Y.Z-dist.zip
+```
+
+
 
