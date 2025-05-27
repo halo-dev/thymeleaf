@@ -37,25 +37,13 @@
   <packaging>pom</packaging>
   <name>thymeleaf distribution</name>
 
+  <properties>
+    <artifact.deploy.disabled>true</artifact.deploy.disabled>
+  </properties>
+
   <build>
 
     <plugins>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-gpg-plugin</artifactId>
-        <configuration>
-          <skip>true</skip>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-deploy-plugin</artifactId>
-        <configuration>
-          <skip>true</skip>
-        </configuration>
-      </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
