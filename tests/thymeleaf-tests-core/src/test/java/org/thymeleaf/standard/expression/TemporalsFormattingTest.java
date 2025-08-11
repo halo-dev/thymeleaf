@@ -29,6 +29,8 @@ import java.time.temporal.Temporal;
 import java.util.Locale;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledForJreRange;
+import org.junit.jupiter.api.condition.JRE;
 import org.thymeleaf.expression.Temporals;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -42,6 +44,7 @@ public class TemporalsFormattingTest {
     private final Temporals temporals = new Temporals(Locale.US, ZoneOffset.UTC);
 
     @Test
+    @EnabledForJreRange(max = JRE.JAVA_19)
     public void testFormat() {
         Temporal time = ZonedDateTime.of(2015, 12, 31, 23, 59, 45, 0, ZoneOffset.UTC);
         assertEquals("December 31, 2015 at 11:59:45 PM Z", temporals.format(time));
@@ -53,6 +56,7 @@ public class TemporalsFormattingTest {
     }
 
     @Test
+    @EnabledForJreRange(max = JRE.JAVA_19)
     public void testFormatWithLocale() {
         Temporal time = ZonedDateTime.of(2015, 12, 31, 23, 59, 45, 0, ZoneOffset.UTC);
         assertEquals("31. Dezember 2015 um 23:59:45 Z", temporals.format(time, Locale.GERMANY));
@@ -80,6 +84,7 @@ public class TemporalsFormattingTest {
     }
 
     @Test
+    @EnabledForJreRange(max = JRE.JAVA_19)
     public void testFormatStandardPatternDateTime() {
         Temporal time = LocalDateTime.of(2015, 12, 31, 23, 59);
         assertEquals("12/31/15, 11:59 PM", temporals.format(time, "SHORT", Locale.US));
@@ -98,6 +103,7 @@ public class TemporalsFormattingTest {
     }
 
     @Test
+    @EnabledForJreRange(max = JRE.JAVA_19)
     public void testFormatStandardPatternTime() {
         Temporal time = LocalTime.of( 23, 59);
         assertEquals("11:59 PM", temporals.format(time, "SHORT", Locale.US));

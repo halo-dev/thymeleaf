@@ -30,6 +30,8 @@ import java.util.Locale;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledForJreRange;
+import org.junit.jupiter.api.condition.JRE;
 import org.thymeleaf.expression.Temporals;
 
 
@@ -37,7 +39,7 @@ import org.thymeleaf.expression.Temporals;
  * Tests regarding formatting of all temporal classes.
  */
 public class TemporalsClassesFormattingTest {
-    
+
     private final Temporals temporals = new Temporals(Locale.US, ZoneOffset.UTC);
 
     @Test
@@ -45,39 +47,43 @@ public class TemporalsClassesFormattingTest {
         Temporal time = LocalDate.of(2015, 12, 31);
         Assertions.assertEquals("December 31, 2015", temporals.format(time));
     }
-    
+
     @Test
+    @EnabledForJreRange(max = JRE.JAVA_19)
     public void localDateTime() {
         Temporal time = LocalDateTime.of(2015, 12, 31, 23, 59, 45);
         Assertions.assertEquals("December 31, 2015, 11:59:45 PM", temporals.format(time));
     }
-    
+
     @Test
+    @EnabledForJreRange(max = JRE.JAVA_19)
     public void zonedDateTime() {
         Temporal time = ZonedDateTime.of(2015, 12, 31, 23, 59, 45, 0, ZoneOffset.UTC);
         Assertions.assertEquals("December 31, 2015 at 11:59:45 PM Z", temporals.format(time));
     }
-    
+
     @Test
     public void instant() {
         Temporal time = Instant.ofEpochSecond(1);
         // Default formatting for Instant
         Assertions.assertEquals("1970-01-01T00:00:01Z", temporals.format(time));
     }
-    
+
     @Test
+    @EnabledForJreRange(max = JRE.JAVA_19)
     public void localTime() {
         Temporal time = LocalTime.of(23, 59, 45);
         Assertions.assertEquals("11:59:45 PM", temporals.format(time));
     }
-    
+
     @Test
     public void offsetTime() {
         Temporal time = OffsetTime.of(23, 59, 45, 0, ZoneOffset.MAX);
         Assertions.assertEquals("23:59:45GMT+18:00", temporals.format(time));
     }
-    
+
     @Test
+    @EnabledForJreRange(max = JRE.JAVA_19)
     public void offsetDateTime() {
         Temporal time = OffsetDateTime.of(2015, 12, 31, 23, 59, 45, 0, ZoneOffset.MAX);
         Assertions.assertEquals("December 31, 2015, 11:59:45 PMGMT+18:00", temporals.format(time, Locale.US));
@@ -89,13 +95,13 @@ public class TemporalsClassesFormattingTest {
         Temporal time = Year.of(2015);
         Assertions.assertEquals("2015", temporals.format(time));
     }
-    
+
     @Test
     public void yearMonth() {
         Temporal time = YearMonth.of(2015, 12);
         Assertions.assertEquals("December 2015", temporals.format(time, Locale.US));
     }
-    
+
     @Test
     public void yearMonthForYMDLocales() {
         Temporal time = YearMonth.of(2015, 12);
