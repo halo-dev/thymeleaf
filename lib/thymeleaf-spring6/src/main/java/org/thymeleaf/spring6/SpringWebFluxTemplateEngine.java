@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.ReactiveAdapterRegistry;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferFactory;
+import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.MediaType;
 import org.thymeleaf.IThrottledTemplateProcessor;
 import org.thymeleaf.TemplateEngine;
@@ -181,7 +182,7 @@ public class SpringWebFluxTemplateEngine
             final DataBufferFactory bufferFactory, final Charset charset) {
 
         final Mono<DataBuffer> stream =
-                Mono.create(
+                Mono.<DataBuffer>create(
                         subscriber -> {
 
                             if (logger.isTraceEnabled()) {
@@ -198,6 +199,7 @@ public class SpringWebFluxTemplateEngine
                                 process(templateName, markupSelectors, context, writer);
 
                             } catch (final Throwable t) {
+                                DataBufferUtils.release(dataBuffer);
                                 logger.error(
                                         String.format(
                                                 "[THYMELEAF][%s] Exception processing template \"%s\": %s",
@@ -220,7 +222,8 @@ public class SpringWebFluxTemplateEngine
                             // This is a Mono<?>, so no need to call "next()" or "complete()"
                             subscriber.success(dataBuffer);
 
-                        });
+                        })
+                        .doOnDiscard(DataBuffer.class, DataBufferUtils.releaseConsumer());
 
         // Will add some logging to the data stream
         return stream.log(LOG_CATEGORY_FULL_OUTPUT, Level.FINEST);
@@ -234,7 +237,7 @@ public class SpringWebFluxTemplateEngine
             final String templateName, final Set<String> markupSelectors, final IContext context,
             final DataBufferFactory bufferFactory, final Charset charset, final int responseMaxChunkSizeBytes) {
 
-        final Flux<DataBuffer> stream = Flux.generate(
+        final Flux<DataBuffer> stream = Flux.<DataBuffer, StreamThrottledTemplateProcessor>generate(
 
                 // Using the throttledProcessor as state in this Flux.generate allows us to delay the
                 // initialization of the throttled processor until the last moment, when output generation
@@ -265,9 +268,9 @@ public class SpringWebFluxTemplateEngine
 
                     final int bytesProduced;
                     try {
-                        bytesProduced =
-                                throttledProcessor.process(responseMaxChunkSizeBytes, buffer.asOutputStream(), charset);
+                        bytesProduced = throttledProcessor.process(responseMaxChunkSizeBytes, buffer.asOutputStream(), charset);
                     } catch (final Throwable t) {
+                        DataBufferUtils.release(buffer);
                         emitter.error(t);
                         return null;
                     }
@@ -304,7 +307,8 @@ public class SpringWebFluxTemplateEngine
 
                     return throttledProcessor;
 
-                });
+                })
+                .doOnDiscard(DataBuffer.class, DataBufferUtils.releaseConsumer());
 
         // Will add some logging to the data stream
         return stream.log(LOG_CATEGORY_CHUNKED_OUTPUT, Level.FINEST);
@@ -419,7 +423,7 @@ public class SpringWebFluxTemplateEngine
         // STEP 5: React to each buffer of published data by creating one or many (concatMap) DataBuffers containing
         //         the result of processing only that buffer.
         final Flux<DataBuffer> stream = dataDrivenWithContextStream.concatMap(
-                (step) -> Flux.generate(
+                (step) -> Flux.<DataBuffer, Boolean>generate(
 
                         // We set initialize to TRUE as a state, so that the first step executed for this Flux
                         // performs the initialization of the dataDrivenIterator for the entire Flux. It is a need
@@ -490,11 +494,9 @@ public class SpringWebFluxTemplateEngine
 
                             final int bytesProduced;
                             try {
-
-                                bytesProduced =
-                                        throttledProcessor.process(responseMaxChunkSizeBytes, buffer.asOutputStream(), charset);
-
+                                bytesProduced = throttledProcessor.process(responseMaxChunkSizeBytes, buffer.asOutputStream(), charset);
                             } catch (final Throwable t) {
+                                DataBufferUtils.release(buffer);
                                 emitter.error(t);
                                 return Boolean.FALSE;
                             }
@@ -582,7 +584,9 @@ public class SpringWebFluxTemplateEngine
 
                             return Boolean.FALSE;
 
-                        }));
+                        })
+                        .doOnDiscard(DataBuffer.class, DataBufferUtils.releaseConsumer())
+        );
 
 
         // Will add some logging to the data flow
