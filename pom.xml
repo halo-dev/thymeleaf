@@ -532,7 +532,7 @@
                 <goal>sign</goal>
               </goals>
               <configuration>
-                <keyname>releases@thymeleaf.org</keyname>
+                <keyname>johnniang@foxmail.com</keyname>
               </configuration>
             </execution>
           </executions>
