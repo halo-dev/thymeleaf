@@ -106,6 +106,10 @@ public final class ThrottledTemplateProcessor implements IThrottledTemplateProce
         this.allProcessingFinished = false;
     }
 
+    @Override
+    public void close() throws IOException {
+        this.writer.close();
+    }
 
 
     public IThrottledTemplateWriterControl getThrottledTemplateWriterControl() {

@@ -19,6 +19,8 @@
  */
 package org.thymeleaf.spring6;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
@@ -192,36 +194,33 @@ public class SpringWebFluxTemplateEngine
 
                             final DataBuffer dataBuffer = bufferFactory.allocateBuffer(1024);
                             // OutputStreamWriter object have an 8K buffer, but process(...) will flush it at the end
-                            final OutputStreamWriter writer = new OutputStreamWriter(dataBuffer.asOutputStream(), charset);
-
-                            try {
-
+                            boolean release = true;
+                            try (OutputStreamWriter writer = new OutputStreamWriter(dataBuffer.asOutputStream(), charset)) {
                                 process(templateName, markupSelectors, context, writer);
+                                final int bytesProduced = dataBuffer.readableByteCount();
 
+                                if (logger.isTraceEnabled()) {
+                                    logger.trace(
+                                        "[THYMELEAF][{}] FINISHED STREAM PROCESS (FULL MODE) OF TEMPLATE \"{}\" WITH LOCALE {}. PRODUCED {} BYTES",
+                                        new Object[]{
+                                            TemplateEngine.threadIndex(), LoggingUtils.loggifyTemplateName(templateName),
+                                            context.getLocale(), Integer.valueOf(bytesProduced)});
+                                }
+                                // This is a Mono<?>, so no need to call "next()" or "complete()"
+                                subscriber.success(dataBuffer);
+                                release = false;
                             } catch (final Throwable t) {
-                                DataBufferUtils.release(dataBuffer);
                                 logger.error(
                                         String.format(
                                                 "[THYMELEAF][%s] Exception processing template \"%s\": %s",
                                                 new Object[] {TemplateEngine.threadIndex(), LoggingUtils.loggifyTemplateName(templateName), t.getMessage()}),
                                         t);
                                 subscriber.error(t);
-                                return;
+                            } finally {
+                                if (release) {
+                                    DataBufferUtils.release(dataBuffer);
+                                }
                             }
-
-                            final int bytesProduced = dataBuffer.readableByteCount();
-
-                            if (logger.isTraceEnabled()) {
-                                logger.trace(
-                                        "[THYMELEAF][{}] FINISHED STREAM PROCESS (FULL MODE) OF TEMPLATE \"{}\" WITH LOCALE {}. PRODUCED {} BYTES",
-                                        new Object[]{
-                                                TemplateEngine.threadIndex(), LoggingUtils.loggifyTemplateName(templateName),
-                                                context.getLocale(), Integer.valueOf(bytesProduced)});
-                            }
-
-                            // This is a Mono<?>, so no need to call "next()" or "complete()"
-                            subscriber.success(dataBuffer);
-
                         })
                         .doOnDiscard(DataBuffer.class, DataBufferUtils.releaseConsumer());
 
@@ -236,7 +235,6 @@ public class SpringWebFluxTemplateEngine
     private Flux<DataBuffer> createChunkedStream(
             final String templateName, final Set<String> markupSelectors, final IContext context,
             final DataBufferFactory bufferFactory, final Charset charset, final int responseMaxChunkSizeBytes) {
-
         final Flux<DataBuffer> stream = Flux.<DataBuffer, StreamThrottledTemplateProcessor>generate(
 
                 // Using the throttledProcessor as state in this Flux.generate allows us to delay the
@@ -266,47 +264,53 @@ public class SpringWebFluxTemplateEngine
 
                     final DataBuffer buffer = bufferFactory.allocateBuffer(responseMaxChunkSizeBytes);
 
-                    final int bytesProduced;
-                    try {
-                        bytesProduced = throttledProcessor.process(responseMaxChunkSizeBytes, buffer.asOutputStream(), charset);
-                    } catch (final Throwable t) {
-                        DataBufferUtils.release(buffer);
-                        emitter.error(t);
-                        return null;
-                    }
-
-                    if (logger.isTraceEnabled()) {
-                        logger.trace(
-                                "[THYMELEAF][{}][{}] FINISHED PARTIAL STREAM PROCESS (CHUNKED MODE, THROTTLER ID " +
-                                        "\"{}\", CHUNK {}) FOR TEMPLATE \"{}\" WITH LOCALE {}. PRODUCED {} BYTES",
-                                new Object[]{
-                                        TemplateEngine.threadIndex(), throttledProcessor.getProcessorIdentifier(),
-                                        throttledProcessor.getProcessorIdentifier(), Integer.valueOf(throttledProcessor.getChunkCount()),
-                                        LoggingUtils.loggifyTemplateName(templateName), context.getLocale(), Integer.valueOf(bytesProduced)});
-                    }
-
-                    emitter.next(buffer);
-
-                    if (throttledProcessor.isFinished()) {
-
+                    boolean release = true;
+                    try (OutputStream os = buffer.asOutputStream()){
+                        final int bytesProduced = throttledProcessor.process(responseMaxChunkSizeBytes, os, charset);
                         if (logger.isTraceEnabled()) {
                             logger.trace(
-                                    "[THYMELEAF][{}][{}] FINISHED ALL STREAM PROCESS (CHUNKED MODE, THROTTLER ID " +
-                                            "\"{}\") FOR TEMPLATE \"{}\" WITH LOCALE {}. PRODUCED A TOTAL OF {} BYTES IN {} CHUNKS",
-                                    new Object[]{
-                                            TemplateEngine.threadIndex(), throttledProcessor.getProcessorIdentifier(),
-                                            throttledProcessor.getProcessorIdentifier(),
-                                            LoggingUtils.loggifyTemplateName(templateName), context.getLocale(),
-                                            Long.valueOf(throttledProcessor.getTotalBytesProduced()),
-                                            Integer.valueOf(throttledProcessor.getChunkCount() + 1)});
+                                "[THYMELEAF][{}][{}] FINISHED PARTIAL STREAM PROCESS (CHUNKED MODE, THROTTLER ID " +
+                                    "\"{}\", CHUNK {}) FOR TEMPLATE \"{}\" WITH LOCALE {}. PRODUCED {} BYTES",
+                                new Object[]{
+                                    TemplateEngine.threadIndex(), throttledProcessor.getProcessorIdentifier(),
+                                    throttledProcessor.getProcessorIdentifier(), Integer.valueOf(throttledProcessor.getChunkCount()),
+                                    LoggingUtils.loggifyTemplateName(templateName), context.getLocale(), Integer.valueOf(bytesProduced)});
                         }
+                        emitter.next(buffer);
+                        if (throttledProcessor.isFinished()) {
 
-                        emitter.complete();
+                            if (logger.isTraceEnabled()) {
+                                logger.trace(
+                                    "[THYMELEAF][{}][{}] FINISHED ALL STREAM PROCESS (CHUNKED MODE, THROTTLER ID " +
+                                        "\"{}\") FOR TEMPLATE \"{}\" WITH LOCALE {}. PRODUCED A TOTAL OF {} BYTES IN {} CHUNKS",
+                                    new Object[]{
+                                        TemplateEngine.threadIndex(), throttledProcessor.getProcessorIdentifier(),
+                                        throttledProcessor.getProcessorIdentifier(),
+                                        LoggingUtils.loggifyTemplateName(templateName), context.getLocale(),
+                                        Long.valueOf(throttledProcessor.getTotalBytesProduced()),
+                                        Integer.valueOf(throttledProcessor.getChunkCount() + 1)});
+                            }
 
+                            emitter.complete();
+
+                        }
+                        release = false;
+                    } catch (final Throwable t) {
+                        emitter.error(t);
+                    } finally {
+                        if (release) {
+                            DataBufferUtils.release(buffer);
+                        }
                     }
-
                     return throttledProcessor;
-
+                }, throttledProcessor -> {
+                    try {
+                        throttledProcessor.close();
+                    } catch (IOException e) {
+                        if (logger.isDebugEnabled()) {
+                            logger.warn("Failed to close throttled processor", e);
+                        }
+                    }
                 })
                 .doOnDiscard(DataBuffer.class, DataBufferUtils.releaseConsumer());
 
@@ -417,7 +421,16 @@ public class SpringWebFluxTemplateEngine
                 )),
 
                 // No need to explicitly dispose the throttled template processor.
-                throttledProcessor -> { /* Nothing to be done here! */ });
+                throttledProcessor -> {
+                    /* Nothing to be done here! */
+                    try {
+                        throttledProcessor.close();
+                    } catch (IOException e) {
+                        if (logger.isDebugEnabled()) {
+                            logger.warn("Failed to close throttled processor", e);
+                        }
+                    }
+                });
 
 
         // STEP 5: React to each buffer of published data by creating one or many (concatMap) DataBuffers containing
@@ -487,103 +500,100 @@ public class SpringWebFluxTemplateEngine
                                                 LoggingUtils.loggifyTemplateName(templateName), context.getLocale()});
                             }
 
-                            final DataBuffer buffer =
-                                    (responseMaxChunkSizeBytes != Integer.MAX_VALUE ?
-                                            bufferFactory.allocateBuffer(responseMaxChunkSizeBytes) :
-                                            bufferFactory.allocateBuffer(1024));
-
-                            final int bytesProduced;
+                            DataBuffer buffer = null;
+                            boolean release = true;
                             try {
-                                bytesProduced = throttledProcessor.process(responseMaxChunkSizeBytes, buffer.asOutputStream(), charset);
-                            } catch (final Throwable t) {
-                                DataBufferUtils.release(buffer);
-                                emitter.error(t);
-                                return Boolean.FALSE;
-                            }
-
-
-                            if (logger.isTraceEnabled()) {
-                                logger.trace(
-                                        "[THYMELEAF][{}][{}] FINISHED PARTIAL STREAM PROCESS (DATA-DRIVEN MODE, THROTTLER ID " +
-                                                "\"{}\", CHUNK {}) FOR TEMPLATE \"{}\" WITH LOCALE {}. PRODUCED {} BYTES",
-                                        new Object[]{
-                                                TemplateEngine.threadIndex(), throttledProcessor.getProcessorIdentifier(),
-                                                throttledProcessor.getProcessorIdentifier(), Integer.valueOf(throttledProcessor.getChunkCount()),
-                                                LoggingUtils.loggifyTemplateName(templateName), context.getLocale(), Integer.valueOf(bytesProduced)});
-                            }
-
-
-                            // If we produced no bytes, then let's avoid skipping an event number from the sequence
-                            if (bytesProduced == 0) {
-                                dataDrivenTemplateIterator.takeBackLastEventID();
-                            }
-
-
-                            // Now it's time to determine if we should execute another time for the same
-                            // data-driven step or rather we should consider we have done everything possible
-                            // for this step (e.g. produced all markup for a data stream buffer) and just
-                            // emit "complete" and go for the next step.
-                            boolean phaseFinished = false;
-                            if (throttledProcessor.isFinished()) {
-
+                                buffer = (responseMaxChunkSizeBytes != Integer.MAX_VALUE ?
+                                    bufferFactory.allocateBuffer(responseMaxChunkSizeBytes) :
+                                    bufferFactory.allocateBuffer(1024));
+                                final int bytesProduced = throttledProcessor.process(responseMaxChunkSizeBytes, buffer.asOutputStream(), charset);
                                 if (logger.isTraceEnabled()) {
                                     logger.trace(
-                                            "[THYMELEAF][{}][{}] FINISHED ALL STREAM PROCESS (DATA-DRIVEN MODE, THROTTLER ID " +
-                                                    "\"{}\") FOR TEMPLATE \"{}\" WITH LOCALE {}. PRODUCED A TOTAL OF {} BYTES IN {} CHUNKS",
-                                            new Object[]{
-                                                    TemplateEngine.threadIndex(), throttledProcessor.getProcessorIdentifier(),
-                                                    throttledProcessor.getProcessorIdentifier(),
-                                                    LoggingUtils.loggifyTemplateName(templateName), context.getLocale(),
-                                                    Long.valueOf(throttledProcessor.getTotalBytesProduced()),
-                                                    Integer.valueOf(throttledProcessor.getChunkCount() + 1)});
+                                        "[THYMELEAF][{}][{}] FINISHED PARTIAL STREAM PROCESS (DATA-DRIVEN MODE, THROTTLER ID " +
+                                            "\"{}\", CHUNK {}) FOR TEMPLATE \"{}\" WITH LOCALE {}. PRODUCED {} BYTES",
+                                        new Object[]{
+                                            TemplateEngine.threadIndex(), throttledProcessor.getProcessorIdentifier(),
+                                            throttledProcessor.getProcessorIdentifier(), Integer.valueOf(throttledProcessor.getChunkCount()),
+                                            LoggingUtils.loggifyTemplateName(templateName), context.getLocale(), Integer.valueOf(bytesProduced)});
                                 }
 
-                                // We have finished executing the template, which can happen after
-                                // finishing iterating all data driver values, or also if we are at the
-                                // first execution and there was no need to use the data driver at all
-                                phaseFinished = true;
-                                dataDrivenTemplateIterator.finishStep();
 
-                            } else {
+                                // If we produced no bytes, then let's avoid skipping an event number from the sequence
+                                if (bytesProduced == 0) {
+                                    dataDrivenTemplateIterator.takeBackLastEventID();
+                                }
 
-                                if (step.isHead() && dataDrivenTemplateIterator.hasBeenQueried()) {
 
-                                    // We know everything before the data driven iteration has already been
-                                    // processed because the iterator has been used at least once (i.e. its
-                                    // 'hasNext()' or 'next()' method have been called at least once). This will
-                                    // mean we can switch to the buffer phase.
+                                // Now it's time to determine if we should execute another time for the same
+                                // data-driven step or rather we should consider we have done everything possible
+                                // for this step (e.g. produced all markup for a data stream buffer) and just
+                                // emit "complete" and go for the next step.
+                                boolean phaseFinished = false;
+                                if (throttledProcessor.isFinished()) {
+                                    if (logger.isTraceEnabled()) {
+                                        logger.trace(
+                                            "[THYMELEAF][{}][{}] FINISHED ALL STREAM PROCESS (DATA-DRIVEN MODE, THROTTLER ID " +
+                                                "\"{}\") FOR TEMPLATE \"{}\" WITH LOCALE {}. PRODUCED A TOTAL OF {} BYTES IN {} CHUNKS",
+                                            new Object[]{
+                                                TemplateEngine.threadIndex(), throttledProcessor.getProcessorIdentifier(),
+                                                throttledProcessor.getProcessorIdentifier(),
+                                                LoggingUtils.loggifyTemplateName(templateName), context.getLocale(),
+                                                Long.valueOf(throttledProcessor.getTotalBytesProduced()),
+                                                Integer.valueOf(throttledProcessor.getChunkCount() + 1)});
+                                    }
+
+                                    // We have finished executing the template, which can happen after
+                                    // finishing iterating all data driver values, or also if we are at the
+                                    // first execution and there was no need to use the data driver at all
                                     phaseFinished = true;
                                     dataDrivenTemplateIterator.finishStep();
 
-                                } else if (step.isDataBuffer() && !dataDrivenTemplateIterator.continueBufferExecution()) {
-                                    // We have finished executing this buffer of items and we can go for the
-                                    // next one or maybe the tail.
-                                    phaseFinished = true;
+                                } else {
+
+                                    if (step.isHead() && dataDrivenTemplateIterator.hasBeenQueried()) {
+
+                                        // We know everything before the data driven iteration has already been
+                                        // processed because the iterator has been used at least once (i.e. its
+                                        // 'hasNext()' or 'next()' method have been called at least once). This will
+                                        // mean we can switch to the buffer phase.
+                                        phaseFinished = true;
+                                        dataDrivenTemplateIterator.finishStep();
+
+                                    } else if (step.isDataBuffer() && !dataDrivenTemplateIterator.continueBufferExecution()) {
+                                        // We have finished executing this buffer of items and we can go for the
+                                        // next one or maybe the tail.
+                                        phaseFinished = true;
+                                    }
+                                    // fluxStep.isTail(): nothing to do, as the only reason we would have to emit
+                                    // 'complete' at the tail step would be throttledProcessor.isFinished(), which
+                                    // has been already checked.
+
                                 }
-                                // fluxStep.isTail(): nothing to do, as the only reason we would have to emit
-                                // 'complete' at the tail step would be throttledProcessor.isFinished(), which
-                                // has been already checked.
 
+                                // Compute if the output for this step has been already finished (i.e. not only the
+                                // processing of the model's events, but also any existing overflows). This has to be
+                                // queried BEFORE the buffer is emitted.
+                                final boolean stepOutputFinished = dataDrivenTemplateIterator.isStepOutputFinished();
+
+                                // Buffer has now everything it should, so send it to the output channels
+                                emitter.next(buffer);
+
+
+                                // If step finished, we have ot emit 'complete' now, giving the opportunity to execute
+                                // again if processing has finished, but we still have some overflow to be flushed
+                                if (phaseFinished && stepOutputFinished) {
+                                    emitter.complete();
+                                }
+                                release = false;
+                                return Boolean.FALSE;
+                            } catch (final Throwable t) {
+                                emitter.error(t);
+                                return Boolean.FALSE;
+                            } finally {
+                                if (release && buffer != null) {
+                                    DataBufferUtils.release(buffer);
+                                }
                             }
-
-                            // Compute if the output for this step has been already finished (i.e. not only the
-                            // processing of the model's events, but also any existing overflows). This has to be
-                            // queried BEFORE the buffer is emitted.
-                            final boolean stepOutputFinished = dataDrivenTemplateIterator.isStepOutputFinished();
-
-                            // Buffer has now everything it should, so send it to the output channels
-                            emitter.next(buffer);
-
-
-                            // If step finished, we have ot emit 'complete' now, giving the opportunity to execute
-                            // again if processing has finished, but we still have some overflow to be flushed
-                            if (phaseFinished && stepOutputFinished) {
-                                emitter.complete();
-                            }
-
-
-                            return Boolean.FALSE;
-
                         })
                         .doOnDiscard(DataBuffer.class, DataBufferUtils.releaseConsumer())
         );
@@ -670,7 +680,7 @@ public class SpringWebFluxTemplateEngine
      * take care to establish the adequate thread synchronization/memory barriers at their asynchronous boundaries,
      * thus avoiding thread visibility issues.
      */
-    static class StreamThrottledTemplateProcessor {
+    static class StreamThrottledTemplateProcessor implements Closeable {
 
         private final IThrottledTemplateProcessor throttledProcessor;
         private final DataDrivenTemplateIterator dataDrivenTemplateIterator;
@@ -718,6 +728,11 @@ public class SpringWebFluxTemplateEngine
             this.chunkCount = -1; // First chunk will be considered number 0
             this.totalBytesProduced = 0L;
 
+        }
+
+        @Override
+        public void close() throws IOException {
+            this.throttledProcessor.close();
         }
 
         int process(final int maxOutputInBytes, final OutputStream outputStream, final Charset charset) {
