@@ -19,6 +19,7 @@
  */
 package org.thymeleaf;
 
+import java.io.Closeable;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.nio.charset.Charset;
@@ -52,7 +53,7 @@ import java.nio.charset.Charset;
  * @since 3.0.0
  *
  */
-public interface IThrottledTemplateProcessor {
+public interface IThrottledTemplateProcessor extends Closeable {
 
 
     /**

@@ -215,7 +215,9 @@ class ThrottledTemplateWriter extends Writer implements IThrottledTemplateWriter
 
     @Override
     public void close() throws IOException {
-        this.writer.close();
+        if (this.writer != null) {
+            this.writer.close();
+        }
     }
 
 
