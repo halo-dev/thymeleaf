@@ -1,7 +1,7 @@
 /*
  * =============================================================================
  *
- *   Copyright (c) 2011-2025 Thymeleaf (http://www.thymeleaf.org)
+ *   Copyright (c) 2011-2026 Thymeleaf (http://www.thymeleaf.org)
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -970,6 +970,10 @@ public abstract class AbstractConfigurableTemplateResolver extends AbstractTempl
 
         final boolean shouldApplySuffix =
                 hasSuffix && (forceSuffix || !ContentTypeUtils.hasRecognizedFileExtension(unaliasedName));
+
+        if (hasPrefix && prefix.endsWith("/") && unaliasedName.startsWith("/")) {
+            unaliasedName = unaliasedName.substring(1);
+        }
 
         if (!hasPrefix && !shouldApplySuffix){
             return unaliasedName;

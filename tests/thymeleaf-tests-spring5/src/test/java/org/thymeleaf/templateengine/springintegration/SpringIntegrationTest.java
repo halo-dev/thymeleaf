@@ -1,7 +1,7 @@
 /*
  * =============================================================================
  * 
- *   Copyright (c) 2011-2025 Thymeleaf (http://www.thymeleaf.org)
+ *   Copyright (c) 2011-2026 Thymeleaf (http://www.thymeleaf.org)
  * 
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.thymeleaf.dialect.IDialect;
 import org.thymeleaf.templateengine.springintegration.context.ErrorsSpringIntegrationWebProcessingContextBuilder;
 import org.thymeleaf.templateengine.springintegration.context.SpringIntegrationWebProcessingContextBuilder;
+import org.thymeleaf.templateengine.springintegration.context.WebflowLikeErrorsSpringIntegrationWebProcessingContextBuilder;
 import org.thymeleaf.templateengine.springintegration.dialect.binding.BindingDialect;
 import org.thymeleaf.testing.templateengine.context.IProcessingContextBuilder;
 import org.thymeleaf.testing.templateengine.engine.TestExecutor;
@@ -93,6 +94,36 @@ public class SpringIntegrationTest {
         executor.setDialects(Arrays.asList(new IDialect[] { SpringStandardDialectUtils.createSpringStandardDialectInstance(true, false)}));
         executor.setThrottleStep(throttleStep);
         executor.execute("classpath:templateengine/springintegration/errors");
+
+        Assertions.assertTrue(executor.isAllOK());
+
+    }
+
+
+
+    @ParameterizedTest
+    @ArgumentsSource(ThrottleArgumentsProvider.class)
+    public void testErrorsMvc(final int throttleStep) throws Exception {
+
+        final TestExecutor executor = TestExecutorFactory.createTestExecutor(new ErrorsSpringIntegrationWebProcessingContextBuilder());
+        executor.setDialects(Arrays.asList(new IDialect[] { SpringStandardDialectUtils.createSpringStandardDialectInstance(true, false)}));
+        executor.setThrottleStep(throttleStep);
+        executor.execute("classpath:templateengine/springintegration/errors-mvc");
+
+        Assertions.assertTrue(executor.isAllOK());
+
+    }
+
+
+
+    @ParameterizedTest
+    @ArgumentsSource(ThrottleArgumentsProvider.class)
+    public void testErrorsWebflow(final int throttleStep) throws Exception {
+
+        final TestExecutor executor = TestExecutorFactory.createTestExecutor(new WebflowLikeErrorsSpringIntegrationWebProcessingContextBuilder());
+        executor.setDialects(Arrays.asList(new IDialect[] { SpringStandardDialectUtils.createSpringStandardDialectInstance(true, false)}));
+        executor.setThrottleStep(throttleStep);
+        executor.execute("classpath:templateengine/springintegration/errors-webflow");
 
         Assertions.assertTrue(executor.isAllOK());
 

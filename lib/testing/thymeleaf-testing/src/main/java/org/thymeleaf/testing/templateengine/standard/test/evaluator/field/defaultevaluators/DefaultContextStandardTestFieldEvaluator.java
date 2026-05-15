@@ -1,7 +1,7 @@
 /*
  * =============================================================================
  * 
- *   Copyright (c) 2011-2025 Thymeleaf (http://www.thymeleaf.org)
+ *   Copyright (c) 2011-2026 Thymeleaf (http://www.thymeleaf.org)
  * 
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
  */
 package org.thymeleaf.testing.templateengine.standard.test.evaluator.field.defaultevaluators;
 
-import java.io.ByteArrayInputStream;
+import java.io.StringReader;
 import java.util.List;
 import java.util.Map;
 
@@ -70,15 +70,8 @@ public class DefaultContextStandardTestFieldEvaluator extends AbstractStandardTe
         final MultiValueProperties properties = new MultiValueProperties();
 
         try {
-            
-            /*
-             * This String -> byte[] conversion is needed because java.util.Properties 
-             * did not allow using a java.io.Reader for loading properties until Java 6.
-             */
-            final byte[] valueAsBytes = fieldValue.getBytes("ISO-8859-1");
-            final ByteArrayInputStream inputStream = new ByteArrayInputStream(valueAsBytes);
 
-            properties.load(inputStream);
+            properties.load(new StringReader(fieldValue));
             
         } catch (final Throwable t) {
             throw new TestEngineExecutionException( 

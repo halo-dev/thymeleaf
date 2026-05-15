@@ -3,7 +3,7 @@
 <!--
   ~ =============================================================================
   ~
-  ~   Copyright (c) 2011-2025 Thymeleaf (http://www.thymeleaf.org)
+  ~   Copyright (c) 2011-2026 Thymeleaf (http://www.thymeleaf.org)
   ~
   ~   Licensed under the Apache License, Version 2.0 (the "License");
   ~   you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@
   <groupId>org.thymeleaf</groupId>
   <artifactId>thymeleaf-parent</artifactId>
   <packaging>pom</packaging>
-  <version>3.1.4-SNAPSHOT</version>
+  <version>3.1.6-SNAPSHOT</version>
   <name>thymeleaf parent</name>
   <description>Modern server-side Java template engine for both web and standalone environments</description>
   <url>http://www.thymeleaf.org</url>
@@ -142,43 +142,43 @@
     <attoparser.version>2.0.7.RELEASE</attoparser.version>
     <unbescape.version>1.1.6.RELEASE</unbescape.version>
     <spring-framework5.version>5.3.39</spring-framework5.version>
-    <spring-framework6.version>6.2.0</spring-framework6.version>
+    <spring-framework6.version>6.2.17</spring-framework6.version>
     <spring-security5.version>5.8.16</spring-security5.version>
-    <spring-security6.version>6.4.1</spring-security6.version>
+    <spring-security6.version>6.5.9</spring-security6.version>
     <spring-webflow2.version>2.5.1.RELEASE</spring-webflow2.version>
     <spring-webflow3.version>3.0.1</spring-webflow3.version>
     <jackson.version>2.18.2</jackson.version>
     <reactor.version>2024.0.0</reactor.version>
-    <commons-lang3.version>3.17.0</commons-lang3.version>
-    <commons-io.version>2.18.0</commons-io.version>
-    <commons-fileupload.version>1.5</commons-fileupload.version>
-    <hibernate-validator-jakarta.version>8.0.1.Final</hibernate-validator-jakarta.version>
+    <commons-lang3.version>3.20.0</commons-lang3.version>
+    <commons-io.version>2.21.0</commons-io.version>
+    <commons-fileupload.version>1.6.0</commons-fileupload.version>
+    <hibernate-validator-jakarta.version>9.1.0.Final</hibernate-validator-jakarta.version>
     <hibernate-validator-javax.version>6.2.5.Final</hibernate-validator-javax.version>
-    <mockito.version>5.14.2</mockito.version>
-    <slf4j.version>2.0.16</slf4j.version>
-    <log4j.version>2.24.2</log4j.version>
-    <junit.version>5.11.3</junit.version>
+    <mockito.version>5.23.0</mockito.version>
+    <slf4j.version>2.0.17</slf4j.version>
+    <log4j.version>2.25.3</log4j.version>
+    <junit.version>5.14.3</junit.version>
     <!-- ======================     -->
     <!-- MAVEN PLUGIN versions      -->
     <!-- ======================     -->
-    <maven-clean-plugin.version>3.4.0</maven-clean-plugin.version>
-    <maven-dependency-plugin.version>3.8.1</maven-dependency-plugin.version>
-    <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
-    <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
-    <maven-surefire-plugin.version>3.5.2</maven-surefire-plugin.version>
+    <maven-clean-plugin.version>3.5.0</maven-clean-plugin.version>
+    <maven-dependency-plugin.version>3.10.0</maven-dependency-plugin.version>
+    <maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
+    <maven-resources-plugin.version>3.5.0</maven-resources-plugin.version>
+    <maven-surefire-plugin.version>3.5.5</maven-surefire-plugin.version>
     <maven-failsafe-plugin.version>3.5.2</maven-failsafe-plugin.version>
-    <maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
-    <maven-war-plugin.version>3.4.0</maven-war-plugin.version>
-    <maven-javadoc-plugin.version>3.11.1</maven-javadoc-plugin.version>
-    <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
-    <maven-gpg-plugin.version>3.2.7</maven-gpg-plugin.version>
-    <maven-deploy-plugin.version>3.1.3</maven-deploy-plugin.version>
-    <maven-scm-plugin.version>2.1.0</maven-scm-plugin.version>
-    <maven-antrun-plugin.version>3.1.0</maven-antrun-plugin.version>
-    <maven-assembly-plugin.version>3.7.1</maven-assembly-plugin.version>
-    <maven-versions-plugin.version>2.18.0</maven-versions-plugin.version>
-    <maven-cargo-plugin.version>1.10.15</maven-cargo-plugin.version>
-    <maven-central-publishing-plugin.version>0.7.0</maven-central-publishing-plugin.version>
+    <maven-jar-plugin.version>3.5.0</maven-jar-plugin.version>
+    <maven-war-plugin.version>3.5.1</maven-war-plugin.version>
+    <maven-javadoc-plugin.version>3.12.0</maven-javadoc-plugin.version>
+    <maven-source-plugin.version>3.4.0</maven-source-plugin.version>
+    <maven-gpg-plugin.version>3.2.8</maven-gpg-plugin.version>
+    <maven-deploy-plugin.version>3.1.4</maven-deploy-plugin.version>
+    <maven-scm-plugin.version>2.2.1</maven-scm-plugin.version>
+    <maven-antrun-plugin.version>3.2.0</maven-antrun-plugin.version>
+    <maven-assembly-plugin.version>3.8.0</maven-assembly-plugin.version>
+    <maven-versions-plugin.version>2.21.0</maven-versions-plugin.version>
+    <maven-cargo-plugin.version>1.10.26</maven-cargo-plugin.version>
+    <maven-central-publishing-plugin.version>0.10.0</maven-central-publishing-plugin.version>
   </properties>
 
 
@@ -557,13 +557,6 @@
         <!--     nexus-staging-maven-plugin and REMOVE their executions, so     -->
         <!--     that only central-publishing-maven-plugin executes during      -->
         <!--     the "deploy" phase.                                            -->
-        <!--   * As of version 0.7.0, the "skipPublishing" flag applies to the  -->
-        <!--     entire bundle, so there is no way to determine which specific  -->
-        <!--     artifacts should be deployed and which should not (as can be   -->
-        <!--     done with maven-deploy-plugin's "maven.deploy.skip" property). -->
-        <!--     This means artifacts need to be excluded by means of the       -->
-        <!--     "excludedArtifacts" property, which does not allow the         -->
-        <!--     specification of groupIDs or wildcards (only artifactIDs).     -->
         <plugin>
           <groupId>org.sonatype.central</groupId>
           <artifactId>central-publishing-maven-plugin</artifactId>
@@ -571,54 +564,7 @@
           <extensions>true</extensions>
           <configuration>
             <publishingServerId>central</publishingServerId>
-            <!--                                                              -->
-            <!-- If "skipPublishing" worked per-artifact, we could use it.    -->
-            <!-- <skipPublishing>${artifact.deploy.disabled}</skipPublishing> -->
-            <!--                                                              -->
-            <!-- The entire "excludeArtifacts" configuration below could be   -->
-            <!-- removed if the behavior of "skipPublishing" changes in a     -->
-            <!-- future version of the plugin.                                -->
-            <excludeArtifacts>
-              <artifact>thymeleaf-dist</artifact>
-              <artifact>thymeleaf-examples</artifact>
-              <artifact>thymeleaf-examples-core</artifact>
-              <artifact>thymeleaf-examples-gtvg-jakarta</artifact>
-              <artifact>thymeleaf-examples-gtvg-javax</artifact>
-              <artifact>thymeleaf-examples-spring5</artifact>
-              <artifact>thymeleaf-examples-spring5-extrathyme</artifact>
-              <artifact>thymeleaf-examples-spring5-sayhello</artifact>
-              <artifact>thymeleaf-examples-spring5-springmail</artifact>
-              <artifact>thymeleaf-examples-spring5-stsm</artifact>
-              <artifact>thymeleaf-examples-spring5-thvsjsp</artifact>
-              <artifact>thymeleaf-examples-spring6</artifact>
-              <artifact>thymeleaf-examples-spring6-extrathyme</artifact>
-              <artifact>thymeleaf-examples-spring6-sayhello</artifact>
-              <artifact>thymeleaf-examples-spring6-springmail</artifact>
-              <artifact>thymeleaf-examples-spring6-stsm</artifact>
-              <artifact>thymeleaf-examples-spring6-thvsjsp</artifact>
-              <artifact>thymeleaf-examples-springboot2</artifact>
-              <artifact>thymeleaf-examples-springboot2-biglist-mvc</artifact>
-              <artifact>thymeleaf-examples-springboot2-biglist-webflux</artifact>
-              <artifact>thymeleaf-examples-springboot2-sse-webflux</artifact>
-              <artifact>thymeleaf-examples-springboot2-stsm-mvc</artifact>
-              <artifact>thymeleaf-examples-springboot2-stsm-webflux</artifact>
-              <artifact>thymeleaf-examples-springboot3</artifact>
-              <artifact>thymeleaf-examples-springboot3-biglist-mvc</artifact>
-              <artifact>thymeleaf-examples-springboot3-biglist-webflux</artifact>
-              <artifact>thymeleaf-examples-springboot3-sse-webflux</artifact>
-              <artifact>thymeleaf-examples-springboot3-stsm-mvc</artifact>
-              <artifact>thymeleaf-examples-springboot3-stsm-webflux</artifact>
-              <artifact>thymeleaf-examples-springsecurity5</artifact>
-              <artifact>thymeleaf-examples-springsecurity5-websecurity</artifact>
-              <artifact>thymeleaf-examples-springsecurity6</artifact>
-              <artifact>thymeleaf-examples-springsecurity6-websecurity</artifact>
-              <artifact>thymeleaf-tests</artifact>
-              <artifact>thymeleaf-tests-core</artifact>
-              <artifact>thymeleaf-tests-spring5</artifact>
-              <artifact>thymeleaf-tests-spring6</artifact>
-              <artifact>thymeleaf-tests-springsecurity5</artifact>
-              <artifact>thymeleaf-tests-springsecurity6</artifact>
-            </excludeArtifacts>
+            <skipPublishing>${artifact.deploy.disabled}</skipPublishing>
           </configuration>
         </plugin>
 

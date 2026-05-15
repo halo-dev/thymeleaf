@@ -1,7 +1,7 @@
 /*
  * =============================================================================
  * 
- *   Copyright (c) 2011-2025 Thymeleaf (http://www.thymeleaf.org)
+ *   Copyright (c) 2011-2026 Thymeleaf (http://www.thymeleaf.org)
  * 
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -62,6 +62,10 @@ public class FragmentExpressionTest {
         checkFragmentSelection("C:\\Program Files\\apps\\templates\\WEB-INF\\temp.html :: 'fragment number one'", "'C:\\Program Files\\apps\\templates\\WEB-INF\\temp.html'","'fragment number one'", null);
         checkFragmentSelection("/home/user/apps/templates/WEB-INF/temp.html :: 'fragment number one'", "'/home/user/apps/templates/WEB-INF/temp.html'","'fragment number one'", null);
         checkFragmentSelection("home/user :: 'fragment number one'", "'home/user'","'fragment number one'", null);
+        checkFragmentSelection("/some/template :: frag('test(value')", "'/some/template'", "frag", "'_arg0'='test(value'");
+        checkFragmentSelection("/some/template :: frag('test)value')", "'/some/template'", "frag", "'_arg0'='test)value'");
+        checkFragmentSelection("/some/template :: frag('(testvalue)')", "'/some/template'", "frag", "'_arg0'='(testvalue)'");
+        checkFragmentSelection("/some/template :: frag('test\\'')", "'/some/template'", "frag", "'_arg0'='test\\''");
     }
 
 

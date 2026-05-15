@@ -1,7 +1,7 @@
 /*
  * =============================================================================
  * 
- *   Copyright (c) 2011-2025 Thymeleaf (http://www.thymeleaf.org)
+ *   Copyright (c) 2011-2026 Thymeleaf (http://www.thymeleaf.org)
  * 
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -62,13 +62,18 @@ public final class ExpressionUtilsTest {
         Assertions.assertTrue(isTypeBlockedForAllPurposes("jakarta.servlet.X"));
         Assertions.assertFalse(isTypeBlockedForAllPurposes("com.whatever.X"));
         Assertions.assertTrue(isTypeBlockedForAllPurposes("com.sun.X"));
+        Assertions.assertTrue(isTypeBlockedForAllPurposes("sun.X"));
         Assertions.assertTrue(isTypeBlockedForAllPurposes("jdk.X"));
+        Assertions.assertTrue(isTypeBlockedForAllPurposes("org.ietf.jgss.X"));
+        Assertions.assertTrue(isTypeBlockedForAllPurposes("org.omg.X"));
+        Assertions.assertTrue(isTypeBlockedForAllPurposes("org.w3c.dom.X"));
+        Assertions.assertTrue(isTypeBlockedForAllPurposes("org.xml.sax.X"));
     }
 
     @Test
     public void typeBlockedForTypeReferenceTest() {
         Assertions.assertFalse(isTypeBlockedForTypeReference("org.thymeleaf.X"));
-        Assertions.assertFalse(isTypeBlockedForTypeReference("org.springframework.X"));
+        Assertions.assertTrue(isTypeBlockedForTypeReference("org.springframework.X"));
         Assertions.assertTrue(isTypeBlockedForTypeReference("org.springframework.cglib.X"));
         Assertions.assertTrue(isTypeBlockedForTypeReference("org.springframework.aot.X"));
         Assertions.assertTrue(isTypeBlockedForTypeReference("org.springframework.javapoet.X"));
@@ -84,77 +89,97 @@ public final class ExpressionUtilsTest {
         Assertions.assertTrue(isTypeBlockedForTypeReference("jakarta.servlet.X"));
         Assertions.assertFalse(isTypeBlockedForTypeReference("com.whatever.X"));
         Assertions.assertTrue(isTypeBlockedForTypeReference("com.sun.X"));
+        Assertions.assertTrue(isTypeBlockedForTypeReference("sun.X"));
         Assertions.assertTrue(isTypeBlockedForTypeReference("jdk.X"));
+        Assertions.assertTrue(isTypeBlockedForTypeReference("org.ietf.jgss.X"));
+        Assertions.assertTrue(isTypeBlockedForTypeReference("org.omg.X"));
+        Assertions.assertTrue(isTypeBlockedForTypeReference("org.w3c.dom.X"));
+        Assertions.assertTrue(isTypeBlockedForTypeReference("org.xml.sax.X"));
+
+        Assertions.assertTrue(isTypeBlockedForTypeReference("com.squareup.javapoet.X"));
+        Assertions.assertTrue(isTypeBlockedForTypeReference("com.zaxxer.hikari.X"));
+        Assertions.assertTrue(isTypeBlockedForTypeReference("com.fasterxml.jackson.X"));
+        Assertions.assertTrue(isTypeBlockedForTypeReference("tools.jackson.X"));
+        Assertions.assertTrue(isTypeBlockedForTypeReference("groovy.X"));
+        Assertions.assertTrue(isTypeBlockedForTypeReference("io.netty.X"));
+        Assertions.assertTrue(isTypeBlockedForTypeReference("javassist.X"));
+        Assertions.assertTrue(isTypeBlockedForTypeReference("javax0.geci.X"));
+        Assertions.assertTrue(isTypeBlockedForTypeReference("kotlin.X"));
+        Assertions.assertTrue(isTypeBlockedForTypeReference("net.sf.cglib.X"));
+        Assertions.assertTrue(isTypeBlockedForTypeReference("org.apache.tomcat.jdbc.X"));
+        Assertions.assertTrue(isTypeBlockedForTypeReference("org.apache.commons.dbcp2.X"));
+        Assertions.assertTrue(isTypeBlockedForTypeReference("org.apache.commons.lang.reflect.X"));
+        Assertions.assertTrue(isTypeBlockedForTypeReference("org.apache.commons.lang3.reflect.X"));
+        Assertions.assertTrue(isTypeBlockedForTypeReference("org.apache.bcel.X"));
+        Assertions.assertTrue(isTypeBlockedForTypeReference("org.apache.logging.X"));
+        Assertions.assertTrue(isTypeBlockedForTypeReference("org.aspectj.X"));
+        Assertions.assertTrue(isTypeBlockedForTypeReference("org.codehaus.groovy.X"));
+        Assertions.assertTrue(isTypeBlockedForTypeReference("org.eclipse.jetty.X"));
+        Assertions.assertTrue(isTypeBlockedForTypeReference("org.glassfish.X"));
+        Assertions.assertTrue(isTypeBlockedForTypeReference("org.javassist.X"));
+        Assertions.assertTrue(isTypeBlockedForTypeReference("org.jboss.X"));
+        Assertions.assertTrue(isTypeBlockedForTypeReference("org.jetbrains.kotlin.X"));
+        Assertions.assertTrue(isTypeBlockedForTypeReference("org.jruby.X"));
+        Assertions.assertTrue(isTypeBlockedForTypeReference("org.junit.X"));
+        Assertions.assertTrue(isTypeBlockedForTypeReference("org.mockito.X"));
+        Assertions.assertTrue(isTypeBlockedForTypeReference("org.mortbay.jetty.X"));
+        Assertions.assertTrue(isTypeBlockedForTypeReference("org.objectweb.asm.X"));
+        Assertions.assertTrue(isTypeBlockedForTypeReference("org.objenesis.X"));
+        Assertions.assertTrue(isTypeBlockedForTypeReference("org.python.X"));
+        Assertions.assertTrue(isTypeBlockedForTypeReference("scala.X"));
     }
 
     @Test
     public void typeAllowedTest() {
-        Assertions.assertTrue(isTypeAllowed("org.thymeleaf.X"));
-        Assertions.assertTrue(isTypeAllowed("org.springframework.X"));
-        Assertions.assertFalse(isTypeAllowed("org.springframework.cglib.X"));
-        Assertions.assertFalse(isTypeAllowed("org.springframework.aot.X"));
-        Assertions.assertFalse(isTypeAllowed("org.springframework.javapoet.X"));
-        Assertions.assertFalse(isTypeAllowed("net.bytebuddy.X"));
-        Assertions.assertTrue(isTypeAllowed("es.whatever.X"));
-        Assertions.assertTrue(isTypeAllowed("de.whatever.X"));
-        Assertions.assertFalse(isTypeAllowed("java.lang.X"));
-        Assertions.assertTrue(isTypeAllowed("java.time.X"));
-        Assertions.assertFalse(isTypeAllowed("javax.servlet.X"));
-        Assertions.assertFalse(isTypeAllowed("jakarta.servlet.X"));
-        Assertions.assertTrue(isTypeAllowed("com.whatever.X"));
-        Assertions.assertFalse(isTypeAllowed("com.sun.X"));
-        Assertions.assertFalse(isTypeAllowed("jdk.X"));
-        Assertions.assertFalse(isTypeAllowed("java.lang.Runtime"));
-        Assertions.assertTrue(isTypeAllowed("java.lang.Integer"));
-        Assertions.assertTrue(isTypeAllowed("java.util.Collection"));
-        Assertions.assertTrue(isTypeAllowed("java.util.stream.Stream"));
-        Assertions.assertTrue(isTypeAllowed("java.util.Calendar"));
-        Assertions.assertTrue(isTypeAllowed("java.util.Map"));
-        Assertions.assertTrue(isTypeAllowed("java.util.concurrent.atomic.AtomicInteger"));
+        Assertions.assertTrue(!isTypeForbidden("org.thymeleaf.X"));
+        Assertions.assertFalse(!isTypeForbidden("org.springframework.X"));
+        Assertions.assertFalse(!isTypeForbidden("org.springframework.cglib.X"));
+        Assertions.assertFalse(!isTypeForbidden("org.springframework.aot.X"));
+        Assertions.assertFalse(!isTypeForbidden("org.springframework.javapoet.X"));
+        Assertions.assertFalse(!isTypeForbidden("net.bytebuddy.X"));
+        Assertions.assertTrue(!isTypeForbidden("es.whatever.X"));
+        Assertions.assertTrue(!isTypeForbidden("de.whatever.X"));
+        Assertions.assertFalse(!isTypeForbidden("java.lang.X"));
+        Assertions.assertTrue(!isTypeForbidden("java.time.X"));
+        Assertions.assertFalse(!isTypeForbidden("javax.servlet.X"));
+        Assertions.assertFalse(!isTypeForbidden("jakarta.servlet.X"));
+        Assertions.assertTrue(!isTypeForbidden("com.whatever.X"));
+        Assertions.assertFalse(!isTypeForbidden("com.sun.X"));
+        Assertions.assertFalse(!isTypeForbidden("jdk.X"));
+        Assertions.assertFalse(!isTypeForbidden("java.lang.Runtime"));
+        Assertions.assertTrue(!isTypeForbidden("java.lang.Integer"));
+        Assertions.assertTrue(!isTypeForbidden("java.util.Collection"));
+        Assertions.assertTrue(!isTypeForbidden("java.util.stream.Stream"));
+        Assertions.assertTrue(!isTypeForbidden("java.util.Calendar"));
+        Assertions.assertTrue(!isTypeForbidden("java.util.Map"));
+        Assertions.assertTrue(!isTypeForbidden("java.util.concurrent.atomic.AtomicInteger"));
+        Assertions.assertTrue(!isTypeForbidden("java.math.BigDecimal"));
+        Assertions.assertTrue(!isTypeForbidden("java.sql.Timestamp"));
+        Assertions.assertTrue(!isTypeForbidden("java.util.Optional"));
     }
 
     @Test
     public void memberAllowedForTypeTest() {
-        Assertions.assertTrue(isMemberAllowedForInstanceOfType(TemplateEngine.class, "someMethod"));
-        Assertions.assertTrue(isMemberAllowedForInstanceOfType(createTestProxy().getClass(), "someMethod"));
-        Assertions.assertTrue(isMemberAllowedForInstanceOfType(Integer.class, "someMethod"));
-        Assertions.assertTrue(isMemberAllowedForInstanceOfType(Temporal.class, "someMethod"));
-        Assertions.assertFalse(isMemberAllowedForInstanceOfType(javax.servlet.ServletContext.class, "someMethod"));
-        Assertions.assertFalse(isMemberAllowedForInstanceOfType(jakarta.servlet.ServletContext.class, "someMethod"));
-        Assertions.assertFalse(isMemberAllowedForInstanceOfType(Runtime.class, "someMethod"));
-        Assertions.assertTrue(isMemberAllowedForInstanceOfType(Collection.class, "iterator"));
-        Assertions.assertTrue(isMemberAllowedForInstanceOfType(Stream.class, "collect"));
-        Assertions.assertTrue(isMemberAllowedForInstanceOfType(Calendar.class, "getInstance"));
-        Assertions.assertTrue(isMemberAllowedForInstanceOfType(Map.class, "get"));
-        Assertions.assertFalse(isMemberAllowedForInstanceOfType(Collection.class, "toString"));
-        Assertions.assertFalse(isMemberAllowedForInstanceOfType(Stream.class, "toString"));
-        Assertions.assertTrue(isMemberAllowedForInstanceOfType(Calendar.class, "toString"));
-        Assertions.assertFalse(isMemberAllowedForInstanceOfType(Map.class, "toString"));
-        Assertions.assertTrue(isMemberAllowedForInstanceOfType(ArrayList.class, "toString"));
-        Assertions.assertTrue(isMemberAllowedForInstanceOfType(GregorianCalendar.class, "toString"));
-        Assertions.assertTrue(isMemberAllowedForInstanceOfType(LinkedHashMap.class, "toString"));
+        Assertions.assertTrue(!isMemberForbiddenForInstanceOfType(TemplateEngine.class, "someMethod"));
+        Assertions.assertTrue(!isMemberForbiddenForInstanceOfType(createTestProxy().getClass(), "someMethod"));
+        Assertions.assertTrue(!isMemberForbiddenForInstanceOfType(Integer.class, "someMethod"));
+        Assertions.assertTrue(!isMemberForbiddenForInstanceOfType(Temporal.class, "someMethod"));
+        Assertions.assertFalse(!isMemberForbiddenForInstanceOfType(javax.servlet.ServletContext.class, "someMethod"));
+        Assertions.assertFalse(!isMemberForbiddenForInstanceOfType(jakarta.servlet.ServletContext.class, "someMethod"));
+        Assertions.assertFalse(!isMemberForbiddenForInstanceOfType(Runtime.class, "someMethod"));
+        Assertions.assertTrue(!isMemberForbiddenForInstanceOfType(Collection.class, "iterator"));
+        Assertions.assertTrue(!isMemberForbiddenForInstanceOfType(Stream.class, "collect"));
+        Assertions.assertTrue(!isMemberForbiddenForInstanceOfType(Calendar.class, "getInstance"));
+        Assertions.assertTrue(!isMemberForbiddenForInstanceOfType(Map.class, "get"));
+        Assertions.assertFalse(!isMemberForbiddenForInstanceOfType(Collection.class, "toString"));
+        Assertions.assertFalse(!isMemberForbiddenForInstanceOfType(Stream.class, "toString"));
+        Assertions.assertTrue(!isMemberForbiddenForInstanceOfType(Calendar.class, "toString"));
+        Assertions.assertFalse(!isMemberForbiddenForInstanceOfType(Map.class, "toString"));
+        Assertions.assertTrue(!isMemberForbiddenForInstanceOfType(ArrayList.class, "toString"));
+        Assertions.assertTrue(!isMemberForbiddenForInstanceOfType(GregorianCalendar.class, "toString"));
+        Assertions.assertTrue(!isMemberForbiddenForInstanceOfType(LinkedHashMap.class, "toString"));
+        Assertions.assertTrue(isMemberForbiddenForInstanceOfType(ClassLoader.class, "loadClass"));
     }
-
-
-    @Test
-    public void testNormalizeExpression() {
-        Assertions.assertNull(normalize(null));
-        Assertions.assertEquals("", normalize(""));
-        final String exp00 = "${something}";
-        Assertions.assertSame(exp00, normalize(exp00));
-        Assertions.assertEquals("${some thing}", normalize("${some thing}"));
-        Assertions.assertEquals("${some \nthing}", normalize("${some \nthing}"));
-        Assertions.assertEquals("${some thing}", normalize("${some \0thing}"));
-        Assertions.assertEquals("${some thing}", normalize("${some \tthing}"));
-        Assertions.assertEquals("${some thing}", normalize("${some t\t\thing}"));
-        Assertions.assertEquals("${some thing}", normalize("\t${some t\t\thing}"));
-        Assertions.assertEquals("${some thing}", normalize("\t${some thing}"));
-        Assertions.assertEquals("${some thing}", normalize("\t${some t\t\thing}\t"));
-        Assertions.assertEquals("${some thing}", normalize("\t${some thing}\t"));
-        Assertions.assertEquals("${some thing}", normalize("${some t\t\thing}\t"));
-    }
-
-
 
 
     static TestProxied createTestProxy() {

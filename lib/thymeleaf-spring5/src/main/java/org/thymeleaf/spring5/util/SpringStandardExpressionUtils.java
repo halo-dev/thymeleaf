@@ -1,7 +1,7 @@
 /*
  * =============================================================================
  *
- *   Copyright (c) 2011-2025 Thymeleaf (http://www.thymeleaf.org)
+ *   Copyright (c) 2011-2026 Thymeleaf (http://www.thymeleaf.org)
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -37,14 +37,14 @@ public final class SpringStandardExpressionUtils {
     private static final int PARAM_LEN = PARAM_ARRAY.length;
 
 
-    public static boolean containsSpELInstantiationOrStaticOrParam(final String expression) {
+    public static boolean containsExternalAccess(final String expression) {
 
         /*
          * Checks whether the expression contains instantiation of objects ("new SomeClass") or makes use of
          * static methods ("T(SomeClass)") as both are forbidden in certain contexts in restricted mode.
          */
 
-        final String exp = ExpressionUtils.normalize(expression);
+        final String exp = ExpressionUtils.normalize(expression, true);
 
         final int explen = exp.length();
         int n = explen;
@@ -102,6 +102,12 @@ public final class SpringStandardExpressionUtils {
                 return true;
             }
 
+            if (c == '@' &&
+                    ((n + 1 < explen) && isSafeIdentifierChar(exp.charAt(n + 1))) &&
+                    (n == 0  || !isSafeIdentifierChar(exp.charAt(n - 1)))) {
+                return true;
+            }
+
         }
 
         return false;
@@ -114,7 +120,7 @@ public final class SpringStandardExpressionUtils {
         int n = idx;
         while (n-- != 0) {
             c = expression.charAt(n);
-            if (c == 'T') {
+            if (c == 't') {
                 if (n == 0) {
                     return true;
                 }
@@ -129,7 +135,7 @@ public final class SpringStandardExpressionUtils {
 
 
     private static boolean isSafeIdentifierChar(final char c) {
-        return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '_';
+        return (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '_';
     }
 
 

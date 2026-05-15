@@ -1,7 +1,7 @@
 /*
  * =============================================================================
  * 
- *   Copyright (c) 2011-2025 Thymeleaf (http://www.thymeleaf.org)
+ *   Copyright (c) 2011-2026 Thymeleaf (http://www.thymeleaf.org)
  * 
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -116,7 +116,7 @@ public class ResultCompareUtils {
 
                 final String explanation = createExplanation(actualFragment, locator[0], locator[1], expectedFragment);
 
-                return new ResultComparison(false, explanation);
+                return new ResultComparison(false, explanation, actual, expected);
 
             }
             countChar(locator, c);
@@ -131,7 +131,7 @@ public class ResultCompareUtils {
 
             final String explanation = createExplanation(actualFragment, locator[0], locator[1], expectedFragment);
 
-            return new ResultComparison(false, explanation);
+            return new ResultComparison(false, explanation, actual, expected);
 
         }
 
@@ -210,7 +210,7 @@ public class ResultCompareUtils {
                 final String explanation =
                         createExplanation(actualFragment, actualTraceItemLine, actualTraceItemCol, expectedFragment);
 
-                return new ResultComparison(false, explanation);
+                return new ResultComparison(false, explanation, actual, expected);
 
             }
 
@@ -241,7 +241,7 @@ public class ResultCompareUtils {
                 final String explanation =
                         createExplanation(actualFragment, actualTraceItemLine, actualTraceItemCol, expectedFragment);
 
-                return new ResultComparison(false, explanation);
+                return new ResultComparison(false, explanation, actual, expected);
 
             }
 
@@ -894,14 +894,24 @@ public class ResultCompareUtils {
     
     
     public static class ResultComparison {
-        
+
         private final boolean result;
         private final String explanation;
-        
+        private final String actualResult;
+        private final String expectedResult;
+
         public ResultComparison(final boolean result, final String explanation) {
+            this(result, explanation, null, null);
+        }
+
+        public ResultComparison(
+                final boolean result, final String explanation,
+                final String actualResult, final String expectedResult) {
             super();
             this.result = result;
             this.explanation = explanation;
+            this.actualResult = actualResult;
+            this.expectedResult = expectedResult;
         }
 
         public boolean getResult() {
@@ -911,7 +921,15 @@ public class ResultCompareUtils {
         public String getExplanation() {
             return this.explanation;
         }
-        
+
+        public String getActualResult() {
+            return this.actualResult;
+        }
+
+        public String getExpectedResult() {
+            return this.expectedResult;
+        }
+
     }
     
     

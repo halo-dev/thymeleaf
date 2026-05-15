@@ -1,7 +1,7 @@
 /*
  * =============================================================================
  * 
- *   Copyright (c) 2011-2025 Thymeleaf (http://www.thymeleaf.org)
+ *   Copyright (c) 2011-2026 Thymeleaf (http://www.thymeleaf.org)
  * 
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -24,11 +24,14 @@ package org.thymeleaf.testing.templateengine.testable;
 public interface ITestResult {
 
     public boolean isOK();
-    
+
     public boolean hasMessage();
     public String getMessage();
-    
-    public boolean hasThrowable(); 
+
+    public boolean hasThrowable();
     public Throwable getThrowable();
-    
+
+    default String getActualResult() { return null; }
+    default String getExpectedResult() { return null; }
+
 }

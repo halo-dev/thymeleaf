@@ -1,7 +1,7 @@
 /*
  * =============================================================================
  * 
- *   Copyright (c) 2011-2025 Thymeleaf (http://www.thymeleaf.org)
+ *   Copyright (c) 2011-2026 Thymeleaf (http://www.thymeleaf.org)
  * 
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ package org.thymeleaf.testing.templateengine.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -48,6 +49,11 @@ public final class MultiValueProperties {
     public void load(final InputStream inputStream) throws IOException {
         final PropertiesSupport support = new PropertiesSupport(this.values);
         support.load(inputStream);
+    }
+
+    public void load(final Reader reader) throws IOException {
+        final PropertiesSupport support = new PropertiesSupport(this.values);
+        support.load(reader);
     }
  
     

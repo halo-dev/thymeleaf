@@ -1,7 +1,7 @@
 /*
  * =============================================================================
  *
- *   Copyright (c) 2011-2025 Thymeleaf (http://www.thymeleaf.org)
+ *   Copyright (c) 2011-2026 Thymeleaf (http://www.thymeleaf.org)
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ import org.thymeleaf.IEngineConfiguration;
 import org.thymeleaf.engine.ITemplateHandler;
 import org.thymeleaf.engine.TemplateHandlerAdapterMarkupHandler;
 import org.thymeleaf.exceptions.TemplateInputException;
+import org.thymeleaf.exceptions.TemplateProcessingException;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateparser.ITemplateParser;
 import org.thymeleaf.templateparser.markup.decoupled.DecoupledTemplateLogic;
@@ -237,6 +238,13 @@ public abstract class AbstractMarkupTemplateParser implements ITemplateParser {
             final String message = "An error happened during template parsing";
             if (e.getLine() != null && e.getCol() != null) {
                 throw new TemplateInputException(message, (resource != null? resource.getDescription() : template), e.getLine().intValue(), e.getCol().intValue(), e);
+            }
+            final Throwable cause = e.getCause();
+            if (cause instanceof TemplateProcessingException) {
+                final TemplateProcessingException tpe = (TemplateProcessingException) cause;
+                if (tpe.hasLineAndCol()) {
+                    throw new TemplateInputException(message, (resource != null? resource.getDescription() : template), tpe.getLine().intValue(), tpe.getCol().intValue(), e);
+                }
             }
             throw new TemplateInputException(message, (resource != null? resource.getDescription() : template), e);
         }

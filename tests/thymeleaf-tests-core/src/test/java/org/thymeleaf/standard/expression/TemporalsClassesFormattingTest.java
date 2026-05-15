@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2025 Thymeleaf (http://www.thymeleaf.org)
+ * Copyright (c) 2011-2026 Thymeleaf (http://www.thymeleaf.org)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,11 +28,16 @@ import java.time.ZonedDateTime;
 import java.time.temporal.Temporal;
 import java.util.Locale;
 
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledForJreRange;
 import org.junit.jupiter.api.condition.JRE;
 import org.thymeleaf.expression.Temporals;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
@@ -52,14 +57,15 @@ public class TemporalsClassesFormattingTest {
     @EnabledForJreRange(max = JRE.JAVA_19)
     public void localDateTime() {
         Temporal time = LocalDateTime.of(2015, 12, 31, 23, 59, 45);
-        Assertions.assertEquals("December 31, 2015, 11:59:45 PM", temporals.format(time));
+        assertEqualsNormalized("December 31, 2015, 11:59:45 PM", temporals.format(time));
     }
 
     @Test
     @EnabledForJreRange(max = JRE.JAVA_19)
     public void zonedDateTime() {
-        Temporal time = ZonedDateTime.of(2015, 12, 31, 23, 59, 45, 0, ZoneOffset.UTC);
-        Assertions.assertEquals("December 31, 2015 at 11:59:45 PM Z", temporals.format(time));
+        ZonedDateTime time = ZonedDateTime.of(2015, 12, 31, 23, 59, 45, 0, ZoneOffset.UTC);
+        String expected = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG).withLocale(Locale.US).format(time);
+        assertEqualsNormalized(expected, temporals.format(time));
     }
 
     @Test
@@ -73,7 +79,7 @@ public class TemporalsClassesFormattingTest {
     @EnabledForJreRange(max = JRE.JAVA_19)
     public void localTime() {
         Temporal time = LocalTime.of(23, 59, 45);
-        Assertions.assertEquals("11:59:45 PM", temporals.format(time));
+        assertEqualsNormalized("11:59:45 PM", temporals.format(time));
     }
 
     @Test
@@ -86,8 +92,8 @@ public class TemporalsClassesFormattingTest {
     @EnabledForJreRange(max = JRE.JAVA_19)
     public void offsetDateTime() {
         Temporal time = OffsetDateTime.of(2015, 12, 31, 23, 59, 45, 0, ZoneOffset.MAX);
-        Assertions.assertEquals("December 31, 2015, 11:59:45 PMGMT+18:00", temporals.format(time, Locale.US));
-        Assertions.assertEquals("31. Dezember 2015, 23:59:45GMT+18:00", temporals.format(time, Locale.GERMANY));
+        assertEqualsNormalized("December 31, 2015, 11:59:45 PMGMT+18:00", temporals.format(time, Locale.US));
+        assertEqualsNormalized("31. Dezember 2015, 23:59:45GMT+18:00", temporals.format(time, Locale.GERMANY));
     }
 
     @Test
@@ -106,6 +112,12 @@ public class TemporalsClassesFormattingTest {
     public void yearMonthForYMDLocales() {
         Temporal time = YearMonth.of(2015, 12);
         Assertions.assertEquals("2015 December", temporals.format(time, Locale.CANADA));
+    }
+
+    private static void assertEqualsNormalized(final String expected, final String actual) {
+        assertEquals(
+                expected == null ? null : expected.replace('\u202F', ' '),
+                actual == null ? null : actual.replace('\u202F', ' '));
     }
 
 }

@@ -3,7 +3,7 @@
 <!--
   ~ =============================================================================
   ~
-  ~   Copyright (c) 2011-2025 Thymeleaf (http://www.thymeleaf.org)
+  ~   Copyright (c) 2011-2026 Thymeleaf (http://www.thymeleaf.org)
   ~
   ~   Licensed under the Apache License, Version 2.0 (the "License");
   ~   you may not use this file except in compliance with the License.
@@ -74,7 +74,7 @@
   <groupId>org.thymeleaf.examples</groupId>
   <artifactId>thymeleaf-examples-springboot3</artifactId>
   <packaging>pom</packaging>
-  <version>3.1.4-SNAPSHOT</version>
+  <version>3.1.6-SNAPSHOT</version>
   <name>thymeleaf examples springboot3</name>
 
   <organization>
@@ -104,9 +104,9 @@
 
   <repositories>
     <repository>
-      <id>sonatype-nexus-snapshots</id>
-      <name>Sonatype Nexus Snapshots</name>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+      <id>central-portal-snapshots</id>
+      <name>Central Portal Snapshots</name>
+      <url>https://central.sonatype.com/repository/maven-snapshots/</url>
       <snapshots>
         <enabled>true</enabled>
       </snapshots>
@@ -170,6 +170,7 @@
     <module>thymeleaf-examples-springboot3-sse-webflux</module>
     <module>thymeleaf-examples-springboot3-stsm-mvc</module>
     <module>thymeleaf-examples-springboot3-stsm-webflux</module>
+    <module>thymeleaf-examples-springboot3-features-mvc</module>
   </modules>
 
 </project>
